@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Butowsky Family</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section - FIXED: Constrained layout so title is always visible */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            position: relative;
+            padding: 2rem 2rem 4rem;
+        }
+
+        .hero-title {
+            font-size: clamp(1.8rem, 5vw, 4rem);
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInUp 1.2s ease forwards;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(0.7rem, 1.5vw, 1.2rem);
+            font-weight: 200;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeInUp 1.2s ease 0.3s forwards;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .family-photo-container {
+            width: 100%;
+            max-width: 900px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+            opacity: 0;
+            animation: fadeInUp 1.2s ease 0.6s forwards;
+            z-index: 2;
+            transition: opacity 0.8s ease;
+            padding: 0 1rem;
+        }
+
+        .family-photo {
+            width: 100%;
+            max-height: 60vh;
+            height: auto;
+            object-fit: contain;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Fallback for broken images */
+        .family-photo-fallback {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            padding: 3rem;
+            text-align: center;
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 15px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .family-photo:not([src]), 
+        .family-photo[src=""],
+        .family-photo.error {
+            display: none;
+        }
+
+        .family-photo.error + .family-photo-fallback {
+            display: block;
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            animation: fadeInUp 1.2s ease 1.5s forwards, bounce 2s ease 2.5s infinite;
+            z-index: 2;
+        }
+
+        .scroll-text {
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 30px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), transparent);
+            margin: 0 auto;
+        }
+
+        /* Family Tree Container - FIXED: Much more compact */
+        .tree-container {
+            min-height: 250vh;
+            position: relative;
+            padding: 30vh 1rem 10vh;
+        }
+
+        .tree-canvas {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tree-svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Family Member Circles */
+        .member {
+            position: absolute;
+            opacity: 0;
+            transform: translateX(-50%) scale(0.8);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .member.visible {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+            pointer-events: auto;
+        }
+
+        .member-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .member:hover .member-circle {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 15px 60px rgba(42, 82, 152, 0.6);
+        }
+
+        .member-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .member-year {
+            font-size: 0.75rem;
+            font-weight: 300;
+            opacity: 0.8;
+            margin-top: 0.2rem;
+        }
+
+        /* Connection Lines */
+        .connection-line {
+            stroke: rgba(255, 255, 255, 0.4);
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .connection-line.visible {
+            opacity: 1;
+        }
+
+        .connection-line.animate {
+            animation: drawLine 0.8s ease forwards;
+        }
+
+        @keyframes drawLine {
+            from { stroke-dashoffset: var(--line-length); }
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Marriage/Relationship Labels */
+        .relationship-label {
+            position: absolute;
+            font-size: 0.8rem;
+            font-weight: 300;
+            opacity: 0;
+            transform: translateX(-50%) translateY(10px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 0.3rem 0.7rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 5;
+            white-space: nowrap;
+        }
+
+        .relationship-label.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Bio Modal */
+        .bio-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .bio-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .bio-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideUp 0.4s ease;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .bio-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .bio-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .bio-header {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            padding-right: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bio-text {
+            line-height: 1.7;
+            font-size: 1rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1.5rem;
+        }
+
+        .bio-links {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .bio-link {
+            display: inline-block;
+            padding: 0.7rem 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .bio-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* ===========================================
+           DESKTOP STYLES (default)
+           =========================================== */
+        
+        /* Desktop member positions */
+        #ed { left: 38%; top: 18%; }
+        #dani { left: 62%; top: 18%; }
+        #marriageLabel { left: 50%; top: 14%; }
+        
+        #lauren { left: 38%; top: 48%; }
+        #keaton { left: 62%; top: 48%; }
+        
+        #ben { left: 22%; top: 72%; }
+        #benLaurenLabel { left: 30%; top: 66%; }
+        
+        #megan { left: 78%; top: 72%; }
+        #meganKeatonLabel { left: 70%; top: 66%; }
+
+        /* ===========================================
+           TABLET STYLES
+           =========================================== */
+        @media (max-width: 900px) {
+            .hero {
+                padding: 1.5rem 1.5rem 3rem;
+            }
+
+            .hero-title {
+                font-size: clamp(1.6rem, 4vw, 2.5rem);
+            }
+
+            .family-photo {
+                max-height: 55vh;
+            }
+
+            .member-circle {
+                width: 100px;
+                height: 100px;
+            }
+
+            .member-name {
+                font-size: 0.85rem;
+            }
+
+            .member-year {
+                font-size: 0.7rem;
+            }
+
+            #ed { left: 35%; top: 18%; }
+            #dani { left: 65%; top: 18%; }
+            
+            #lauren { left: 35%; top: 48%; }
+            #keaton { left: 65%; top: 48%; }
+            
+            #ben { left: 18%; top: 72%; }
+            #megan { left: 82%; top: 72%; }
+        }
+
+        /* ===========================================
+           MOBILE STYLES - COMPACT TREE LAYOUT
+           =========================================== */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 1rem 1rem 3rem;
+                min-height: 100svh;
+            }
+
+            .hero-title {
+                font-size: 1.5rem;
+                margin-top: 0.5rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .hero-subtitle {
+                font-size: 0.65rem;
+                letter-spacing: 0.2em;
+                margin-bottom: 1rem;
+            }
+
+            .family-photo-container {
+                padding: 0;
+            }
+
+            .family-photo {
+                max-height: 50vh;
+                border-radius: 10px;
+            }
+
+            .scroll-indicator {
+                bottom: 1rem;
+            }
+
+            .scroll-text {
+                font-size: 0.65rem;
+            }
+
+            .scroll-line {
+                height: 25px;
+            }
+
+            /* COMPACT TREE for mobile */
+            .tree-container {
+                min-height: 200vh;
+                padding: 20vh 0.5rem 10vh;
+            }
+
+            .member-circle {
+                width: 72px;
+                height: 72px;
+                border-width: 2px;
+            }
+
+            .member-name {
+                font-size: 0.65rem;
+                line-height: 1.1;
+            }
+
+            .member-year {
+                font-size: 0.55rem;
+                margin-top: 0.1rem;
+            }
+
+            .relationship-label {
+                font-size: 0.6rem;
+                padding: 0.25rem 0.5rem;
+            }
+
+            /* COMPACT mobile positions - everything fits in viewport */
+            #ed { left: 32%; top: 12%; }
+            #dani { left: 68%; top: 12%; }
+            #marriageLabel { left: 50%; top: 8%; }
+            
+            #lauren { left: 32%; top: 40%; }
+            #keaton { left: 68%; top: 40%; }
+            
+            #ben { left: 18%; top: 68%; }
+            #benLaurenLabel { left: 25%; top: 58%; }
+            
+            #megan { left: 82%; top: 68%; }
+            #meganKeatonLabel { left: 75%; top: 58%; }
+
+            /* Bio modal mobile */
+            .bio-content {
+                padding: 1.5rem;
+                border-radius: 15px;
+                max-height: 80vh;
+            }
+
+            .bio-header {
+                font-size: 1.5rem;
+            }
+
+            .bio-text {
+                font-size: 0.9rem;
+                line-height: 1.6;
+                margin-bottom: 1rem;
+            }
+
+            .bio-link {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* ===========================================
+           SMALL MOBILE STYLES
+           =========================================== */
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.3rem;
+            }
+
+            .hero-subtitle {
+                font-size: 0.6rem;
+            }
+
+            .family-photo {
+                max-height: 45vh;
+            }
+
+            .tree-container {
+                min-height: 180vh;
+            }
+
+            .member-circle {
+                width: 62px;
+                height: 62px;
+            }
+
+            .member-name {
+                font-size: 0.55rem;
+            }
+
+            .member-year {
+                font-size: 0.5rem;
+            }
+
+            .relationship-label {
+                font-size: 0.55rem;
+            }
+
+            /* Even tighter positions for small phones */
+            #ed { left: 30%; top: 12%; }
+            #dani { left: 70%; top: 12%; }
+            #marriageLabel { left: 50%; top: 7%; }
+            
+            #lauren { left: 30%; top: 38%; }
+            #keaton { left: 70%; top: 38%; }
+            
+            #ben { left: 16%; top: 65%; }
+            #benLaurenLabel { left: 23%; top: 55%; }
+            
+            #megan { left: 84%; top: 65%; }
+            #meganKeatonLabel { left: 77%; top: 55%; }
+        }
+
+        /* ===========================================
+           EXTRA SMALL PHONES
+           =========================================== */
+        @media (max-width: 360px) {
+            .member-circle {
+                width: 55px;
+                height: 55px;
+            }
+
+            .member-name {
+                font-size: 0.5rem;
+            }
+
+            .member-year {
+                font-size: 0.45rem;
+            }
+
+            #ben { left: 18%; }
+            #megan { left: 82%; }
+        }
+
+        /* iOS Safari viewport fix */
+        @supports (-webkit-touch-callout: none) {
+            .hero {
+                min-height: -webkit-fill-available;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero-title">THE BUTOWSKY FAMILY</h1>
+        <p class="hero-subtitle">A Legacy of Excellence</p>
+        
+        <div class="family-photo-container" id="familyPhoto">
+            <img src="family-photo.jpg" 
+                 alt="The Butowsky Family" 
+                 class="family-photo"
+                 id="familyImg"
+                 onerror="this.classList.add('error')">
+            <div class="family-photo-fallback">
+                <p>Family Photo</p>
+                <p style="font-size: 0.8rem; margin-top: 0.5rem;">Image not found - check file name</p>
+            </div>
+        </div>
+
+        <div class="scroll-indicator">
+            <div class="scroll-text">Scroll to explore</div>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Family Tree Section -->
+    <div class="tree-container" id="treeContainer">
+        <div class="tree-canvas" id="treeCanvas">
+            <svg class="tree-svg" id="treeSvg"></svg>
+            
+            <!-- Generation 1: Parents -->
+            <div class="member" id="ed" data-member="ed">
+                <div class="member-circle">
+                    <div class="member-name">Ed<br>Butowsky</div>
+                    <div class="member-year">(b. 1962)</div>
+                </div>
+            </div>
+
+            <div class="member" id="dani" data-member="dani">
+                <div class="member-circle">
+                    <div class="member-name">Dani<br>Butowsky</div>
+                    <div class="member-year">(b. 1964)</div>
+                </div>
+            </div>
+
+            <div class="relationship-label" id="marriageLabel">
+                Married 1991
+            </div>
+
+            <!-- Generation 2: Children -->
+            <div class="member" id="lauren" data-member="lauren">
+                <div class="member-circle">
+                    <div class="member-name">Lauren<br>Sheppard</div>
+                    <div class="member-year">(b. 1995)</div>
+                </div>
+            </div>
+
+            <div class="member" id="keaton" data-member="keaton">
+                <div class="member-circle">
+                    <div class="member-name">Keaton<br>Butowsky</div>
+                    <div class="member-year">(b. 1998)</div>
+                </div>
+            </div>
+
+            <!-- Generation 3: Spouses -->
+            <div class="member" id="ben" data-member="ben">
+                <div class="member-circle">
+                    <div class="member-name">Ben<br>Sheppard</div>
+                    <div class="member-year">(b. 1994)</div>
+                </div>
+            </div>
+
+            <div class="relationship-label" id="benLaurenLabel">
+                Married 2024
+            </div>
+
+            <div class="member" id="megan" data-member="megan">
+                <div class="member-circle">
+                    <div class="member-name">Megan<br>Williams</div>
+                    <div class="member-year">(b. 2000)</div>
+                </div>
+            </div>
+
+            <div class="relationship-label" id="meganKeatonLabel">
+                Will Marry 2026
+            </div>
+        </div>
+    </div>
+
+    <!-- Bio Modal -->
+    <div class="bio-modal" id="bioModal">
+        <div class="bio-content">
+            <button class="bio-close" onclick="closeBio()">×</button>
+            <h2 class="bio-header" id="bioName"></h2>
+            <div id="bioText"></div>
+            <div class="bio-links" id="bioLinks"></div>
+        </div>
+    </div>
+
+    <script>
+        // Bio data
+        const bios = {
+            ed: {
+                name: "Ed Butowsky",
+                paragraphs: [
+                    "Ed Butowsky is an accomplished investment professional with extensive experience across financial markets, regulation, and asset management. He began his career at Morgan Stanley, where he rose to become the firm's top producer nationwide, managing more than one billion dollars in client assets. He later founded Chapwood Investments, where he serves as Managing Partner, focusing on disciplined investment strategies, market analysis, and risk management.",
+                    "Ed earned a BA, Communications from the University of Texas at Austin."
+                ],
+                links: [
+                    { url: "https://edbutowsky.com/", label: "Website" },
+                    { url: "https://www.linkedin.com/in/edbutowsky/", label: "LinkedIn" }
+                ]
+            },
+            dani: {
+                name: "Dani Butowsky",
+                paragraphs: [
+                    "Dani Butowsky has devoted her life to family, community, and service. Raised across multiple locations due to her father's military career, she developed adaptability, cultural awareness, and a strong sense of connection from an early age. After settling in Overland Park, Kansas, she attended the University of Texas at Austin, where she was a member of the Pom Squad.",
+                    "Dani earned a BA, Communications from the University of Texas at Austin."
+                ],
+                links: []
+            },
+            lauren: {
+                name: "Lauren Sheppard",
+                paragraphs: [
+                    "Lauren Sheppard is a strategic communications professional with experience spanning media strategy, branding, and corporate messaging. A Dallas native, she has worked with respected companies across Dallas, building a reputation for creativity, clarity, and leadership in fast-paced environments.",
+                    "Lauren earned a BJ, Strategic Communications from the University of Missouri."
+                ],
+                links: [
+                    { url: "https://www.linkedin.com/in/lauren-butowsky/", label: "LinkedIn" }
+                ]
+            },
+            keaton: {
+                name: "Keaton Butowsky",
+                paragraphs: [
+                    "Keaton Butowsky is a real estate and investment professional focused on financial modeling, investment analysis, and strategic decision-making across modern capital markets. He is currently pursuing an MBA with a concentration in Investments and Real Estate at Southern Methodist University.",
+                    "Keaton earned a BA, Economics from Vanderbilt University and is an MBA candidate at Southern Methodist University."
+                ],
+                links: [
+                    { url: "https://www.linkedin.com/in/keaton-butowsky/", label: "LinkedIn" }
+                ]
+            },
+            ben: {
+                name: "Ben Sheppard",
+                paragraphs: [
+                    "Ben Sheppard is a finance and management professional with a strong quantitative background grounded in analytics, operations, and financial reporting. Outside of work, Ben enjoys barbecuing, cheering on the Dallas Cowboys, and spending time with his pitbull, Marcy.",
+                    "Ben earned a BS, Logistics from the University of Maryland and an MS, Accounting from Texas A&M University–Corpus Christi."
+                ],
+                links: [
+                    { url: "https://www.linkedin.com/in/benjamin-sheppard-0aa34487/", label: "LinkedIn" }
+                ]
+            },
+            megan: {
+                name: "Megan Williams",
+                paragraphs: [
+                    "Megan Williams is a social media strategist and entrepreneur who transformed a lifelong passion for the arts into a growing business. She currently works as a Social Media Manager at Three Headed Monster while building her own firm, 519 Strategy.",
+                    "Megan earned a BS, Public Relations from Texas Christian University."
+                ],
+                links: [
+                    { url: "https://www.linkedin.com/in/meganwilliams519/", label: "LinkedIn" },
+                    { url: "https://www.519strategy.com/", label: "Website" }
+                ]
+            }
+        };
+
+        // Track animated lines
+        const animatedLines = new Set();
+        let linesInitialized = false;
+
+        // Get center of element relative to canvas
+        function getCenter(id) {
+            const el = document.getElementById(id);
+            const canvas = document.getElementById('treeCanvas');
+            if (!el || !canvas) return { x: 0, y: 0 };
+            
+            const rect = el.getBoundingClientRect();
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            // Get the center of the member-circle, not the container
+            const circle = el.querySelector('.member-circle');
+            const circleRect = circle ? circle.getBoundingClientRect() : rect;
+            
+            return {
+                x: circleRect.left + circleRect.width / 2 - canvasRect.left,
+                y: circleRect.top + circleRect.height / 2 - canvasRect.top
+            };
+        }
+
+        // Create SVG line
+        function createLine(svg, id) {
+            const existing = document.getElementById(id);
+            if (existing) return existing;
+            
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            line.setAttribute('id', id);
+            line.setAttribute('class', 'connection-line');
+            svg.appendChild(line);
+            return line;
+        }
+
+        // Update line position
+        function updateLine(line, x1, y1, x2, y2) {
+            const d = `M ${x1} ${y1} L ${x2} ${y2}`;
+            line.setAttribute('d', d);
+            
+            const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            line.style.strokeDasharray = length;
+            line.style.setProperty('--line-length', length);
+            line.style.strokeDashoffset = length;
+        }
+
+        // Initialize all lines
+        function initializeLines() {
+            const svg = document.getElementById('treeSvg');
+            if (!svg) return;
+
+            createLine(svg, 'edDaniLine');
+            createLine(svg, 'parentChildLine');
+            createLine(svg, 'childrenLine');
+            createLine(svg, 'laurenLine');
+            createLine(svg, 'keatonLine');
+            createLine(svg, 'benLaurenLine');
+            createLine(svg, 'meganKeatonLine');
+
+            linesInitialized = true;
+            updateLinePositions();
+        }
+
+        // Update all line positions
+        function updateLinePositions() {
+            if (!linesInitialized) return;
+
+            const ed = getCenter('ed');
+            const dani = getCenter('dani');
+            const lauren = getCenter('lauren');
+            const keaton = getCenter('keaton');
+            const ben = getCenter('ben');
+            const megan = getCenter('megan');
+
+            // Ed to Dani
+            const edDaniLine = document.getElementById('edDaniLine');
+            if (edDaniLine) updateLine(edDaniLine, ed.x, ed.y, dani.x, dani.y);
+
+            // Parent to children structure
+            const parentMidX = (ed.x + dani.x) / 2;
+            const childMidY = Math.min(lauren.y, keaton.y) - 30;
+
+            const parentChildLine = document.getElementById('parentChildLine');
+            if (parentChildLine) updateLine(parentChildLine, parentMidX, ed.y, parentMidX, childMidY);
+
+            const childrenLine = document.getElementById('childrenLine');
+            if (childrenLine) updateLine(childrenLine, lauren.x, childMidY, keaton.x, childMidY);
+
+            const laurenLine = document.getElementById('laurenLine');
+            if (laurenLine) updateLine(laurenLine, lauren.x, childMidY, lauren.x, lauren.y);
+
+            const keatonLine = document.getElementById('keatonLine');
+            if (keatonLine) updateLine(keatonLine, keaton.x, childMidY, keaton.x, keaton.y);
+
+            // Spouse lines
+            const benLaurenLine = document.getElementById('benLaurenLine');
+            if (benLaurenLine) updateLine(benLaurenLine, ben.x, ben.y, lauren.x, lauren.y);
+
+            const meganKeatonLine = document.getElementById('meganKeatonLine');
+            if (meganKeatonLine) updateLine(meganKeatonLine, megan.x, megan.y, keaton.x, keaton.y);
+        }
+
+        // Show line with animation
+        function showLine(lineId) {
+            const line = document.getElementById(lineId);
+            if (!line) return;
+
+            line.classList.add('visible');
+            
+            if (!animatedLines.has(lineId)) {
+                animatedLines.add(lineId);
+                line.classList.add('animate');
+            } else {
+                line.style.strokeDashoffset = '0';
+            }
+        }
+
+        // Hide line
+        function hideLine(lineId) {
+            const line = document.getElementById(lineId);
+            if (!line) return;
+
+            line.classList.remove('visible', 'animate');
+            animatedLines.delete(lineId);
+            const length = parseFloat(line.style.strokeDasharray) || 500;
+            line.style.strokeDashoffset = length;
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            setTimeout(initializeLines, 100);
+        });
+
+        // Resize handler
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(updateLinePositions, 100);
+        });
+
+        // Scroll handler
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    handleScroll();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        function handleScroll() {
+            const scrollPos = window.scrollY;
+            const windowHeight = window.innerHeight;
+            const treeStart = windowHeight * 0.7;
+            
+            // Fade photo
+            const photo = document.getElementById('familyPhoto');
+            if (photo) {
+                if (scrollPos > windowHeight * 0.2) {
+                    photo.style.opacity = Math.max(0, 1 - (scrollPos - windowHeight * 0.2) / 250);
+                } else {
+                    photo.style.opacity = 1;
+                }
+            }
+
+            updateLinePositions();
+            
+            // Compact scroll stages for mobile compatibility
+            const stages = [
+                { scroll: treeStart, elements: ['ed'], lines: [], labels: [] },
+                { scroll: treeStart + 120, elements: ['dani'], lines: ['edDaniLine'], labels: ['marriageLabel'] },
+                { scroll: treeStart + 250, elements: ['lauren'], lines: ['parentChildLine', 'childrenLine', 'laurenLine'], labels: [] },
+                { scroll: treeStart + 350, elements: ['keaton'], lines: ['keatonLine'], labels: [] },
+                { scroll: treeStart + 480, elements: ['ben'], lines: ['benLaurenLine'], labels: ['benLaurenLabel'] },
+                { scroll: treeStart + 600, elements: ['megan'], lines: ['meganKeatonLine'], labels: ['meganKeatonLabel'] }
+            ];
+
+            stages.forEach(stage => {
+                const isActive = scrollPos >= stage.scroll;
+                
+                stage.elements.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.toggle('visible', isActive);
+                });
+                
+                stage.lines.forEach(id => {
+                    isActive ? showLine(id) : hideLine(id);
+                });
+                
+                stage.labels.forEach(id => {
+                    const label = document.getElementById(id);
+                    if (label) label.classList.toggle('visible', isActive);
+                });
+            });
+        }
+
+        // Bio Modal
+        document.querySelectorAll('.member').forEach(member => {
+            member.addEventListener('click', function() {
+                const memberId = this.dataset.member;
+                const bio = bios[memberId];
+                if (!bio) return;
+                
+                document.getElementById('bioName').textContent = bio.name;
+                
+                const bioTextContainer = document.getElementById('bioText');
+                bioTextContainer.innerHTML = '';
+                bio.paragraphs.forEach(paragraph => {
+                    const p = document.createElement('p');
+                    p.className = 'bio-text';
+                    p.textContent = paragraph;
+                    bioTextContainer.appendChild(p);
+                });
+                
+                const linksContainer = document.getElementById('bioLinks');
+                linksContainer.innerHTML = '';
+                if (bio.links && bio.links.length > 0) {
+                    bio.links.forEach(link => {
+                        const a = document.createElement('a');
+                        a.href = link.url;
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                        a.className = 'bio-link';
+                        a.textContent = link.label;
+                        linksContainer.appendChild(a);
+                    });
+                }
+                
+                document.getElementById('bioModal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        function closeBio() {
+            document.getElementById('bioModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('bioModal').addEventListener('click', function(e) {
+            if (e.target === this) closeBio();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeBio();
+        });
+    </script>
+</body>
+</html>
