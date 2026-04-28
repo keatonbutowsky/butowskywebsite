@@ -11,7 +11,7 @@ const sky        = document.getElementById("sky");
 const chart      = document.getElementById("chart");
 const chartSvg   = document.getElementById("chartSvg");
 const heroStage  = document.getElementById("heroStage");
-const hudCounter = document.getElementById("hudCounter");
+const hudCounter = document.getElementById("hudCounter"); // may not exist; null-safe usage below
 const layers = document.querySelectorAll(".starfield");
 const shootingStarsEl = document.getElementById("shootingStars");
 
@@ -174,12 +174,8 @@ function applySceneState(sceneIdx, animateChange = true) {
     if (sceneIdx === 4) launchShootingStar("megan", "keaton");
   }
 
-  // Auto-advance the scrub handle to track scene progression unless user
-  // has taken manual control (scrubMode = true).
-  const yearForScene = [1962, 1991, 1998, 2024, 2026, 2026];
-  if (!scrubMode && typeof setScrubPosition === "function") {
-    setScrubPosition(yearForScene[sceneIdx] ?? 2026, false);
-  }
+  // Scrub auto-advance is handled by scroll-driven interpolation (bindHeroFade
+  // updates it continuously) so the handle glides instead of jumping per scene.
 }
 
 function bindSceneObserver() {
@@ -204,13 +200,31 @@ function bindSceneObserver() {
    4. Hero fade — pure scroll-driven CSS variable
    ============================================================ */
 
-function bindHeroFade() {
+// Year stops aligned to the 6 scenes — used for smooth scroll interpolation.
+const YEAR_STOPS = [1962, 1991, 1998, 2024, 2026, 2026];
+
+function bindScrollDrivers() {
   let raf = null;
   const update = () => {
     const vh = window.innerHeight;
-    // Fade from 1 to 0 as user scrolls from 0 to 0.85 viewports
-    const k = Math.max(0, Math.min(1, window.scrollY / (vh * 0.85)));
-    document.documentElement.style.setProperty("--hero-fade", String(1 - k));
+    const max = document.documentElement.scrollHeight - vh;
+    const scrollK = Math.max(0, Math.min(1, max > 0 ? window.scrollY / max : 0));
+
+    // Hero fade: 1 -> 0 across first 85% of a viewport
+    const heroK = Math.max(0, Math.min(1, window.scrollY / (vh * 0.85)));
+    document.documentElement.style.setProperty("--hero-fade", String(1 - heroK));
+
+    // Scrub handle: continuous lerp through the year stops, keyed to scroll.
+    if (!scrubMode) {
+      const span = scrollK * (YEAR_STOPS.length - 1);
+      const i = Math.floor(span);
+      const frac = span - i;
+      const y0 = YEAR_STOPS[i];
+      const y1 = YEAR_STOPS[Math.min(i + 1, YEAR_STOPS.length - 1)];
+      const year = y0 + (y1 - y0) * frac;
+      setScrubPosition(year, false);
+    }
+
     raf = null;
   };
   window.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
@@ -372,7 +386,6 @@ function openBio(id, push = true) {
   if (!surveyed.has(id)) {
     surveyed.add(id);
     document.querySelector(`.star[data-id="${id}"]`)?.classList.add("surveyed");
-    updateCounter();
     if (surveyed.size === 6 && !chartComplete) triggerChartComplete();
   }
 
@@ -388,12 +401,7 @@ function closeBio(push = true) {
   setTimeout(() => { bio.hidden = true; }, 380);
 }
 
-function updateCounter() {
-  const n = surveyed.size;
-  hudCounter.innerHTML = n === 6
-    ? `<b>Chart complete</b>`
-    : `<b>${n}</b> / 6`;
-}
+// (counter removed)
 
 document.getElementById("bioClose")?.addEventListener("click", () => closeBio());
 bio?.addEventListener("click", (e) => { if (e.target === bio) closeBio(); });
@@ -525,8 +533,8 @@ function boot() {
   renderStars();
   renderLines();
   bindCursorParallax();
-  bindHeroFade();
   bindScrub();
+  bindScrollDrivers();
   bindSceneObserver();
 
   window.addEventListener("resize", () => {
@@ -536,7 +544,6 @@ function boot() {
   document.fonts?.ready?.then(() => renderLines());
 
   applySceneState(0, false);
-  updateCounter();
 
   const initialId = location.hash.replace("#", "");
   if (members[initialId]) openBio(initialId, false);
