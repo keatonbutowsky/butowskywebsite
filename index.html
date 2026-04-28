@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#020726" />
+<meta name="theme-color" content="#020414" />
 <meta name="description" content="The Butowsky family. A constellation of six stars, three generations, charted across the sky." />
 
-<title>Butowsky · A Constellation</title>
+<title>Butowsky</title>
 
 <meta name="view-transition" content="same-origin" />
 
@@ -16,58 +16,39 @@
 
 <link rel="stylesheet" href="css/main.css" />
 
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23061633'/%3E%3Cline x1='22' y1='32' x2='42' y2='32' stroke='%23f4f1e6' stroke-width='1'/%3E%3Cline x1='32' y1='22' x2='32' y2='42' stroke='%23f4f1e6' stroke-width='1'/%3E%3Ccircle cx='32' cy='32' r='8' fill='none' stroke='%237ee0ff' stroke-width='1'/%3E%3C/svg%3E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23050b27'/%3E%3Ccircle cx='32' cy='32' r='3' fill='%23f4f1e6'/%3E%3C/svg%3E" />
 </head>
 <body>
 
-<!-- The persistent sky: stars + connectors live here, fixed full-viewport -->
+<!-- The persistent sky -->
 <div class="sky" id="sky">
-  <div class="starfield layer-1" id="layer1"></div>
-  <div class="starfield layer-2" id="layer2"></div>
-  <div class="starfield layer-3" id="layer3"></div>
+  <div class="starfield layer-1"></div>
+  <div class="starfield layer-2"></div>
+  <div class="starfield layer-3"></div>
 
   <div class="chart" id="chart">
     <svg class="chart-svg" id="chartSvg" preserveAspectRatio="none" aria-hidden="true"></svg>
-    <!-- stars + binary orbits + line labels injected by JS -->
   </div>
 
   <div class="chart-complete-flash" aria-hidden="true"></div>
 </div>
 
-<!-- HUD overlay -->
+<!-- HUD: just identity + survey count -->
 <div class="hud" aria-hidden="true">
-  <div class="hud-top-left">
-    <span><b>BUTOWSKY</b></span>
-    <span>CHART · OBS·26 · <span class="accent" id="hudCoords">RA — · DEC —</span></span>
-  </div>
-  <div class="hud-top-right">
-    <span id="hudCounter">0 / 6 SURVEYED</span>
-    <span><span id="hudYear">YEAR · LIVE</span></span>
-  </div>
-  <div class="hud-bottom-left">
-    <span>SKY · MAGNITUDE +6.0</span>
-  </div>
-  <div class="hud-bottom-right">
-    <span><span class="accent" id="hudScene">SCENE 00 / 05</span></span>
-  </div>
+  <span class="hud-mark">Butowsky</span>
+  <span class="hud-counter" id="hudCounter"><b>0</b> / 6</span>
 </div>
 
-<!-- Scene title (fades in/out per scene) -->
-<div class="scene-title" id="sceneTitle">
-  <span id="sceneTitleMain"></span>
-  <span class="scene-title-sub" id="sceneTitleSub"></span>
+<!-- Hero stage (fixed, fades via --hero-fade as user scrolls past) -->
+<div class="hero-stage" id="heroStage">
+  <span class="lookup">Look up.</span>
+  <h1 class="wordmark">Butowsky</h1>
+  <span class="scroll-cue" aria-hidden="true"></span>
 </div>
 
-<!-- Scroll spacers — these create the scroll length that drives scene progression -->
+<!-- Scroll spacers — empty, just create scroll length to drive scenes -->
 <div class="scenes" id="scenes">
-  <section class="scene" data-scene="0">
-    <div class="scene-content">
-      <span class="lookup">Look up.</span>
-      <h1 class="wordmark">Butowsky</h1>
-      <p class="subwordmark">SIX STARS &middot; THREE GENERATIONS &middot; <span>ONE SKY</span></p>
-      <span class="scroll-cue" aria-hidden="true"></span>
-    </div>
-  </section>
+  <section class="scene" data-scene="0"></section>
   <section class="scene" data-scene="1"></section>
   <section class="scene" data-scene="2"></section>
   <section class="scene" data-scene="3"></section>
@@ -78,14 +59,13 @@
 <!-- Time-scrub bar -->
 <div class="timescrub" id="timescrub" role="group" aria-label="Time scrub">
   <div class="timescrub-row">
-    <span class="timescrub-label">YEAR</span>
-    <span class="timescrub-year" id="scrubYear">LIVE</span>
+    <span class="timescrub-label">Year</span>
+    <span class="timescrub-year" id="scrubYear">2026</span>
   </div>
   <div class="timescrub-track" id="scrubTrack" tabindex="0" role="slider"
        aria-label="Scrub through time" aria-valuemin="1962" aria-valuemax="2026" aria-valuenow="2026">
     <div class="timescrub-rail"></div>
     <div class="timescrub-fill" id="scrubFill"></div>
-    <!-- ticks injected by JS -->
     <div class="timescrub-handle" id="scrubHandle"></div>
   </div>
 </div>
@@ -103,7 +83,7 @@
   <button class="bio-close" id="bioClose" aria-label="Close">&times;</button>
 </aside>
 
-<!-- Shooting stars (positioned absolutely; activated when their scene fires) -->
+<!-- Shooting stars container -->
 <div id="shootingStars" aria-hidden="true"></div>
 
 <script type="module" src="js/main.js"></script>
