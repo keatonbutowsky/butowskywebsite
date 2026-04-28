@@ -67,9 +67,11 @@ function repositionAllStars() {
    ============================================================ */
 
 function getStarCenter(id, refRect) {
-  const star = chart.querySelector(`.star[data-id="${id}"]`);
-  if (!star) return null;
-  const r = star.getBoundingClientRect();
+  // Use the marker child, not the whole .star button (which includes the
+  // alongside name label and would offset the center toward the label side).
+  const marker = chart.querySelector(`.star[data-id="${id}"] .star-marker`);
+  if (!marker) return null;
+  const r = marker.getBoundingClientRect();
   return {
     x: r.left + r.width / 2 - refRect.left,
     y: r.top  + r.height / 2 - refRect.top
@@ -173,6 +175,13 @@ function applySceneState(sceneIdx, animateChange = true) {
   if (animateChange && sceneIdx > previousScene) {
     if (sceneIdx === 3) launchShootingStar("ben",   "lauren");
     if (sceneIdx === 4) launchShootingStar("megan", "keaton");
+  }
+
+  // Auto-advance the scrub handle to track scene progression unless user
+  // has taken manual control (scrubMode = true).
+  const yearForScene = [1962, 1991, 1998, 2024, 2026, 2026];
+  if (!scrubMode && typeof setScrubPosition === "function") {
+    setScrubPosition(yearForScene[sceneIdx] ?? 2026, false);
   }
 }
 
@@ -444,6 +453,7 @@ function setScrubPosition(year, fromUser = false) {
 
   if (fromUser) {
     scrubMode = true;
+    scrub?.classList.add("manual");
     applyScrubVisibility(clamped);
   }
 }
@@ -480,30 +490,35 @@ function trackPctFromEvent(e) {
 
 function bindScrub() {
   buildScrubTicks();
-  setScrubPosition(TIME_MAX, false);
+  setScrubPosition(TIME_MIN, false);
 
-  let dragging = false;
-  const startDrag = (e) => {
-    dragging = true;
+  // Pointer Events — single unified path for mouse, touch, pen.
+  let activePointerId = null;
+  const onDown = (e) => {
+    activePointerId = e.pointerId;
+    scrubTrack.setPointerCapture(e.pointerId);
     setScrubPosition(TIME_MIN + trackPctFromEvent(e) * (TIME_MAX - TIME_MIN), true);
     e.preventDefault();
   };
-  const moveDrag = (e) => {
-    if (!dragging) return;
+  const onMove = (e) => {
+    if (e.pointerId !== activePointerId) return;
     setScrubPosition(TIME_MIN + trackPctFromEvent(e) * (TIME_MAX - TIME_MIN), true);
   };
-  const endDrag = () => { dragging = false; };
+  const onUp = (e) => {
+    if (e.pointerId !== activePointerId) return;
+    activePointerId = null;
+    try { scrubTrack.releasePointerCapture(e.pointerId); } catch {}
+  };
+  scrubTrack.addEventListener("pointerdown",   onDown);
+  scrubTrack.addEventListener("pointermove",   onMove);
+  scrubTrack.addEventListener("pointerup",     onUp);
+  scrubTrack.addEventListener("pointercancel", onUp);
 
-  scrubTrack.addEventListener("mousedown", startDrag);
-  window.addEventListener("mousemove", moveDrag);
-  window.addEventListener("mouseup", endDrag);
-  scrubTrack.addEventListener("touchstart", startDrag, { passive: false });
-  window.addEventListener("touchmove", moveDrag, { passive: false });
-  window.addEventListener("touchend", endDrag);
-
-  scrubTrack.addEventListener("click", (e) => {
-    if (e.target === scrubHandle) return;
-    setScrubPosition(TIME_MIN + trackPctFromEvent(e) * (TIME_MAX - TIME_MIN), true);
+  // Double-click handle returns to scroll-tracking ("live") mode.
+  scrubHandle.addEventListener("dblclick", () => {
+    scrubMode = false;
+    scrub.classList.remove("manual");
+    applySceneState(currentScene, false);
   });
 
   // Reveal scrub after the hero beat completes

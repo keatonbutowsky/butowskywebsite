@@ -144,7 +144,7 @@ export const lines = [
   { id: "dani-lauren",   from: "dani",   to: "lauren", kind: "lineage",  label: null,      scene: 2 },
   { id: "dani-keaton",   from: "dani",   to: "keaton", kind: "lineage",  label: null,      scene: 2 },
   { id: "lauren-ben",    from: "lauren", to: "ben",    kind: "binary",   label: "2024", scene: 3 },
-  { id: "keaton-megan",  from: "keaton", to: "megan",  kind: "projected",label: "2026", scene: 4 }
+  { id: "keaton-megan",  from: "keaton", to: "megan",  kind: "binary",   label: "2026", scene: 4 }
 ];
 
 // Scene metadata — title HUD shows briefly when entering each scene.
