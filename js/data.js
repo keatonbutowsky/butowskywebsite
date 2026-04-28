@@ -12,10 +12,9 @@ export const members = {
     role: "Investment · Markets",
     based: "Plano, TX",
     joined: "birth",
-    pos: { x: 26, y: 30 },
-    mobilePos: { x: 24, y: 28 },
+    pos: { x: 36, y: 24 },
+    mobilePos: { x: 32, y: 20 },
     coords: "RA 02h 15m · DEC +89° 04'",
-    labelSide: "left",
     tagline: "Two billion in client assets, one disciplined philosophy.",
     paragraphs: [
       "Ed Butowsky began his career at Morgan Stanley, rising to the firm's top producer nationwide and managing more than one billion dollars in client assets. He later founded Chapwood Investments, where he serves as Managing Partner — focused on disciplined investment strategy, market analysis, and risk management.",
@@ -34,10 +33,9 @@ export const members = {
     role: "Family · Community",
     based: "Plano, TX",
     joined: "birth",
-    pos: { x: 74, y: 30 },
-    mobilePos: { x: 76, y: 28 },
+    pos: { x: 64, y: 24 },
+    mobilePos: { x: 68, y: 20 },
     coords: "RA 03h 41m · DEC +87° 12'",
-    labelSide: "right",
     tagline: "Family first. Community always.",
     paragraphs: [
       "Dani Butowsky has devoted her life to family, community, and service. Raised across multiple locations during her father's military career, she developed adaptability, cultural awareness, and a strong sense of connection from an early age.",
@@ -53,10 +51,9 @@ export const members = {
     role: "Strategic Comms",
     based: "Dallas, TX",
     joined: "birth",
-    pos: { x: 30, y: 56 },
-    mobilePos: { x: 26, y: 52 },
+    pos: { x: 32, y: 62 },
+    mobilePos: { x: 30, y: 50 },
     coords: "RA 05h 22m · DEC +82° 48'",
-    labelSide: "left",
     tagline: "Sharp messaging for fast-moving brands.",
     paragraphs: [
       "Lauren Sheppard is a strategic communications professional with experience across media strategy, branding, and corporate messaging. A Dallas native, she has worked with respected companies across the city, building a reputation for creativity, clarity, and leadership in fast-paced environments.",
@@ -74,10 +71,9 @@ export const members = {
     role: "Real Estate · Investment",
     based: "Dallas, TX",
     joined: "birth",
-    pos: { x: 70, y: 56 },
-    mobilePos: { x: 74, y: 52 },
+    pos: { x: 68, y: 62 },
+    mobilePos: { x: 70, y: 50 },
     coords: "RA 07h 09m · DEC +80° 15'",
-    labelSide: "right",
     tagline: "Models. Markets. Decisions.",
     paragraphs: [
       "Keaton Butowsky is a real estate and investment professional focused on financial modeling, investment analysis, and strategic decision-making across modern capital markets. He is currently pursuing an MBA with a concentration in Investments and Real Estate at Southern Methodist University.",
@@ -95,10 +91,9 @@ export const members = {
     role: "Finance · Operations",
     based: "Dallas, TX",
     joined: 2024,
-    pos: { x: 14, y: 80 },
-    mobilePos: { x: 14, y: 76 },
+    pos: { x: 12, y: 62 },
+    mobilePos: { x: 10, y: 80 },
     coords: "RA 09h 14m · DEC +74° 33'",
-    labelSide: "right",
     tagline: "Numbers, brisket, and the Cowboys.",
     paragraphs: [
       "Ben Sheppard is a finance and management professional with a strong quantitative background grounded in analytics, operations, and financial reporting. Outside of work, Ben enjoys barbecuing, cheering on the Dallas Cowboys, and spending time with his pitbull, Marcy.",
@@ -116,10 +111,9 @@ export const members = {
     role: "Social Strategy · Founder",
     based: "Dallas, TX",
     joined: 2026,
-    pos: { x: 86, y: 80 },
-    mobilePos: { x: 86, y: 76 },
+    pos: { x: 88, y: 62 },
+    mobilePos: { x: 90, y: 80 },
     coords: "RA 11h 02m · DEC +71° 19'",
-    labelSide: "left",
     tagline: "A passion for the arts, built into a business.",
     paragraphs: [
       "Megan Williams is a social media strategist and entrepreneur who turned a lifelong passion for the arts into a growing business. She works as a Social Media Manager at Three Headed Monster while building her own firm, 519 Strategy.",
@@ -133,18 +127,20 @@ export const members = {
   }
 };
 
-// Connector lines — each gets drawn at the right scene/time.
-// `scene` = scroll-scene index when this line should activate (0-indexed).
-// `kind` = "binary" | "lineage" | "projected"
-// `label` = text shown at line midpoint (mono uppercase). null = no label.
+// Connector lines — classic family tree:
+//   ed ── 1991 ── dani         (horizontal marriage line at top)
+//                  │            (trunk drops from midpoint)
+//             ┌────┴────┐       (junction forks left + right)
+//             │         │       (drops down to each child)
+//   ben ── lauren     keaton ── megan   (children with their spouses, marriage lines horizontal)
+//
+// `kind`: "marriage" (straight horizontal line between partners)
+//       | "tree"     (special: trunk + fork + drops, computed in renderLines)
 export const lines = [
-  { id: "ed-dani",       from: "ed",     to: "dani",   kind: "binary",   label: "1991", scene: 1 },
-  { id: "ed-lauren",     from: "ed",     to: "lauren", kind: "lineage",  label: null,      scene: 2 },
-  { id: "ed-keaton",     from: "ed",     to: "keaton", kind: "lineage",  label: null,      scene: 2 },
-  { id: "dani-lauren",   from: "dani",   to: "lauren", kind: "lineage",  label: null,      scene: 2 },
-  { id: "dani-keaton",   from: "dani",   to: "keaton", kind: "lineage",  label: null,      scene: 2 },
-  { id: "lauren-ben",    from: "lauren", to: "ben",    kind: "binary",   label: "2024", scene: 3 },
-  { id: "keaton-megan",  from: "keaton", to: "megan",  kind: "binary",   label: "2026", scene: 4 }
+  { id: "ed-dani",       kind: "marriage", from: "ed",     to: "dani",   label: "Married 1991",  scene: 1 },
+  { id: "tree-fork",     kind: "tree",     label: null,                                          scene: 2 },
+  { id: "lauren-ben",    kind: "marriage", from: "lauren", to: "ben",    label: "Married 2024",  scene: 3 },
+  { id: "keaton-megan",  kind: "marriage", from: "keaton", to: "megan",  label: "Marrying 2026", scene: 4 }
 ];
 
 // Scene metadata — title HUD shows briefly when entering each scene.

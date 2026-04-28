@@ -211,18 +211,33 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Star label — name only, restrained */
 .star-label {
   position: absolute;
-  top: 50%;
+  left: 50%;
+  top: calc(50% + 22px);
+  transform: translateX(-50%);
+  text-align: center;
   white-space: nowrap;
-  transform: translateY(-50%);
   font-family: var(--f-display);
   font-weight: 600;
-  font-size: clamp(1.05rem, 0.9rem + 0.6vw, 1.4rem);
-  letter-spacing: -0.01em;
   color: var(--c-ivory);
   pointer-events: none;
+  line-height: 1.15;
 }
-.star.label-right .star-label { left: calc(50% + 24px); }
-.star.label-left  .star-label { right: calc(50% + 24px); text-align: right; }
+.star-label .name {
+  display: block;
+  font-size: clamp(1.05rem, 0.9rem + 0.6vw, 1.4rem);
+  letter-spacing: -0.015em;
+}
+.star-label .meta {
+  display: block;
+  font-family: var(--f-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-ivory-dim);
+  margin-top: 4px;
+  font-weight: 500;
+  font-feature-settings: "tnum";
+}
 
 /* ============================================================
    CONNECTOR LINES (SVG) — barely-there hairlines
@@ -268,22 +283,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .line-label.active { opacity: 1; }
 
-/* Binary orbits — barely visible */
-.binary-orbit {
-  position: absolute;
-  border: 1px solid var(--c-ivory-faint);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--d-slow) var(--ease);
-  animation: orbit-rotate 32s linear infinite;
-}
-.binary-orbit.active { opacity: 0.20; }
-@keyframes orbit-rotate {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
-}
+/* (binary orbits dropped — pure tree lines now) */
 
 /* ============================================================
    SHOOTING STAR — soft white trail
@@ -747,6 +747,5 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .star-marker { animation: none !important; }
   .line { stroke-dashoffset: 0 !important; opacity: 1 !important; }
   .starfield { animation: none !important; }
-  .binary-orbit { animation: none !important; opacity: 0.18 !important; }
   .lookup, .wordmark, .scroll-cue { opacity: 1 !important; animation: none !important; }
 }

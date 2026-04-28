@@ -30,7 +30,7 @@ let chartComplete = false;
 function renderStars() {
   Object.entries(members).forEach(([id, m]) => {
     const star = document.createElement("button");
-    star.className = `star label-${m.labelSide || "right"}`;
+    star.className = "star";
     star.dataset.id = id;
     star.setAttribute("aria-label", `View ${m.name}`);
 
@@ -40,7 +40,9 @@ function renderStars() {
 
     const label = document.createElement("span");
     label.className = "star-label";
-    label.textContent = m.name;
+    label.innerHTML =
+      `<span class="name">${m.name}</span>` +
+      `<span class="meta">b. ${m.born}</span>`;
     star.appendChild(label);
 
     chart.appendChild(star);
@@ -85,10 +87,6 @@ function renderLines() {
   chartSvg.setAttribute("height", refRect.height);
 
   for (const line of lines) {
-    const a = getStarCenter(line.from, refRect);
-    const b = getStarCenter(line.to, refRect);
-    if (!a || !b) continue;
-
     let path = chartSvg.querySelector(`path[data-id="${line.id}"]`);
     if (!path) {
       path = document.createElementNS(NS, "path");
@@ -96,51 +94,57 @@ function renderLines() {
       path.setAttribute("class", `line ${line.kind}`);
       chartSvg.appendChild(path);
     }
-    const dx = b.x - a.x, dy = b.y - a.y;
-    const c1x = a.x + dx * 0.35;
-    const c1y = a.y + dy * 0.55;
-    const c2x = a.x + dx * 0.65;
-    const c2y = a.y + dy * 0.45;
-    path.setAttribute("d", `M ${a.x} ${a.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${b.x} ${b.y}`);
-    const length = Math.hypot(dx, dy) * 1.08;
-    path.style.setProperty("--len", length.toFixed(0));
 
-    if (line.label) {
-      let label = chart.querySelector(`.line-label[data-id="${line.id}"]`);
-      if (!label) {
-        label = document.createElement("span");
-        label.className = `line-label ${line.kind}`;
-        label.dataset.id = line.id;
-        label.textContent = line.labelText || line.label.replace(/^M\.\s*/, "");
-        chart.appendChild(label);
+    if (line.kind === "marriage") {
+      // Straight horizontal connector between two partners
+      const a = getStarCenter(line.from, refRect);
+      const b = getStarCenter(line.to, refRect);
+      if (!a || !b) continue;
+      path.setAttribute("d", `M ${a.x} ${a.y} L ${b.x} ${b.y}`);
+      const length = Math.hypot(b.x - a.x, b.y - a.y);
+      path.style.setProperty("--len", length.toFixed(0));
+
+      if (line.label) {
+        let label = chart.querySelector(`.line-label[data-id="${line.id}"]`);
+        if (!label) {
+          label = document.createElement("span");
+          label.className = `line-label ${line.kind}`;
+          label.dataset.id = line.id;
+          label.textContent = line.label;
+          chart.appendChild(label);
+        }
+        label.style.left = ((a.x + b.x) / 2) + "px";
+        label.style.top  = ((a.y + b.y) / 2) + "px";
       }
-      label.style.left = ((a.x + b.x) / 2) + "px";
-      label.style.top  = ((a.y + b.y) / 2) + "px";
+    } else if (line.kind === "tree") {
+      // Trunk + horizontal fork + drops to children
+      const ed     = getStarCenter("ed",     refRect);
+      const dani   = getStarCenter("dani",   refRect);
+      const lauren = getStarCenter("lauren", refRect);
+      const keaton = getStarCenter("keaton", refRect);
+      if (!ed || !dani || !lauren || !keaton) continue;
+
+      const trunkX  = (ed.x + dani.x) / 2;
+      const trunkY0 = (ed.y + dani.y) / 2;
+      // Junction sits ~55% of the way from parents toward children
+      const junctionY = trunkY0 + (lauren.y - trunkY0) * 0.55;
+
+      // Single SVG path with multiple subpaths so it animates as one stroke
+      const d =
+        `M ${trunkX} ${trunkY0} L ${trunkX} ${junctionY} ` +              // trunk
+        `M ${lauren.x} ${junctionY} L ${keaton.x} ${junctionY} ` +        // fork bar
+        `M ${lauren.x} ${junctionY} L ${lauren.x} ${lauren.y} ` +         // left drop
+        `M ${keaton.x} ${junctionY} L ${keaton.x} ${keaton.y}`;           // right drop
+      path.setAttribute("d", d);
+
+      const trunkLen     = Math.abs(junctionY - trunkY0);
+      const horizLen     = Math.abs(keaton.x - lauren.x);
+      const leftDropLen  = Math.abs(lauren.y - junctionY);
+      const rightDropLen = Math.abs(keaton.y - junctionY);
+      const totalLen     = trunkLen + horizLen + leftDropLen + rightDropLen;
+      path.style.setProperty("--len", totalLen.toFixed(0));
     }
   }
-
-  // Binary orbits
-  ["ed-dani", "lauren-ben", "keaton-megan"].forEach(id => {
-    const line = lines.find(l => l.id === id);
-    if (!line) return;
-    let orb = chart.querySelector(`.binary-orbit[data-id="${id}"]`);
-    if (!orb) {
-      orb = document.createElement("div");
-      orb.className = `binary-orbit ${line.kind === "projected" ? "projected" : ""}`;
-      orb.dataset.id = id;
-      chart.appendChild(orb);
-    }
-    const a = getStarCenter(line.from, refRect);
-    const b = getStarCenter(line.to, refRect);
-    if (!a || !b) return;
-    const cx = (a.x + b.x) / 2;
-    const cy = (a.y + b.y) / 2;
-    const radius = Math.hypot(b.x - a.x, b.y - a.y) * 0.62;
-    orb.style.left = cx + "px";
-    orb.style.top  = cy + "px";
-    orb.style.width  = (radius * 2) + "px";
-    orb.style.height = (radius * 2) + "px";
-  });
 }
 
 /* ============================================================
@@ -163,13 +167,6 @@ function applySceneState(sceneIdx, animateChange = true) {
     if (path) path.classList.toggle("active", line.scene <= sceneIdx);
     const lbl = chart.querySelector(`.line-label[data-id="${line.id}"]`);
     if (lbl) lbl.classList.toggle("active", line.scene <= sceneIdx);
-  });
-
-  ["ed-dani", "lauren-ben", "keaton-megan"].forEach(id => {
-    const line = lines.find(l => l.id === id);
-    if (!line) return;
-    const orb = chart.querySelector(`.binary-orbit[data-id="${id}"]`);
-    if (orb) orb.classList.toggle("active", line.scene <= sceneIdx);
   });
 
   if (animateChange && sceneIdx > previousScene) {
@@ -466,19 +463,14 @@ function applyScrubVisibility(year) {
   });
   lines.forEach(line => {
     const lyear = (line.id === "ed-dani") ? 1991
+                : (line.id === "tree-fork") ? 1998
                 : (line.id === "lauren-ben") ? 2024
                 : (line.id === "keaton-megan") ? 2026
-                : Math.max(memberAppearance[line.from].year, memberAppearance[line.to].year);
+                : 9999;
     const path = chartSvg.querySelector(`path[data-id="${line.id}"]`);
     if (path) path.classList.toggle("active", lyear <= year);
     const lbl = chart.querySelector(`.line-label[data-id="${line.id}"]`);
     if (lbl) lbl.classList.toggle("active", lyear <= year);
-  });
-  ["ed-dani", "lauren-ben", "keaton-megan"].forEach(id => {
-    const orb = chart.querySelector(`.binary-orbit[data-id="${id}"]`);
-    if (!orb) return;
-    const yr = id === "ed-dani" ? 1991 : id === "lauren-ben" ? 2024 : 2026;
-    orb.classList.toggle("active", yr <= year);
   });
 }
 
