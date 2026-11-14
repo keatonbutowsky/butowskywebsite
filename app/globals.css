@@ -41,6 +41,10 @@ body {
   color: var(--ink);
 }
 
+.lesson-cta {
+  color: var(--accent);
+}
+
 .subline {
   color: var(--nav);
   letter-spacing: 0.12em;
@@ -84,6 +88,14 @@ body {
 .subline:focus-visible {
   outline-offset: 6px;
   outline: 1px solid var(--accent);
+}
+
+@media (max-width: 767px) {
+  .subline-compact {
+    line-height: 1.25;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
 }
 
 .brand-button {
@@ -851,5 +863,11 @@ body {
 
   .r-num {
     min-width: 1.6rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero-photo {
+    width: 8.375rem;
   }
 }

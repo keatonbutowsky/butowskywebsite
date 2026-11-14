@@ -6,6 +6,7 @@ import { motion, type Variants } from "framer-motion";
 import {
   contact,
   focus,
+  modules,
   now,
   record,
   speaking,
@@ -19,6 +20,9 @@ const eyebrow =
 
 const headline =
   "font-display text-[clamp(2rem,4.5vw,3.4rem)] font-normal leading-[1.02] tracking-[-0.015em]";
+
+const lessonCta =
+  "lesson-cta font-display w-fit text-[clamp(1.5rem,3vw,2.4rem)] leading-tight tracking-[-0.02em] text-[var(--accent)] underline-offset-8 hover:underline focus-visible:underline focus-visible:outline-none";
 
 function NoteRef({ n }: { n: number }) {
   return (
@@ -89,7 +93,13 @@ function EntryList({
   );
 }
 
-export function FocusPanel({ item }: { item: Variants }) {
+export function FocusPanel({
+  item,
+  lessonLabel,
+}: {
+  item: Variants;
+  lessonLabel: string;
+}) {
   return (
     <motion.div variants={item} className="hero">
       <figure className="hero-photo">
@@ -123,6 +133,20 @@ export function FocusPanel({ item }: { item: Variants }) {
             </li>
           ))}
         </ul>
+        <div className="mt-6">
+          <div className="t-lab2">{focus.teaser.label}</div>
+          <p className="m-0 text-[1.0625rem] leading-[1.5] text-[var(--ink)]">
+            {focus.teaser.line}
+          </p>
+          <a
+            href={modules.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${lessonCta} mt-4`}
+          >
+            {lessonLabel}
+          </a>
+        </div>
       </div>
     </motion.div>
   );
@@ -403,6 +427,37 @@ export function SpeakingPanel({ item }: { item: Variants }) {
           </a>
         </div>
       </motion.div>
+    </>
+  );
+}
+
+export function ModulesPanel({
+  item,
+  lessonLabel,
+}: {
+  item: Variants;
+  lessonLabel: string;
+}) {
+  return (
+    <>
+      <motion.div variants={item} id="modules-title" className={eyebrow}>
+        {modules.eyebrow}
+      </motion.div>
+      <motion.h2 variants={item} className={`${headline} mb-8`}>
+        {modules.headline}
+      </motion.h2>
+      <motion.p variants={item} className="sp-lede">
+        {modules.lede}
+      </motion.p>
+      <motion.a
+        variants={item}
+        href={modules.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={lessonCta}
+      >
+        {lessonLabel}
+      </motion.a>
     </>
   );
 }

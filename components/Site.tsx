@@ -7,6 +7,7 @@ import Magnetic from "@/components/Magnetic";
 import {
   ContactPanel,
   FocusPanel,
+  ModulesPanel,
   NowPanel,
   RecordPanel,
   SpeakingPanel,
@@ -23,18 +24,28 @@ const EASE = [0.76, 0, 0.24, 1] as const;
 const ORDER: (PanelId | null)[] = [null, ...panelOrder];
 
 const SHELL =
-  "fixed z-30 flex flex-col overflow-y-auto bg-[var(--panel)] px-[clamp(2.5rem,6vw,6rem)] py-[clamp(3rem,9vh,7rem)] max-md:inset-x-0 max-md:bottom-0 max-md:h-[68%] max-md:justify-start max-md:border-t max-md:border-[var(--hair)] max-md:pt-10 md:top-0 md:right-0 md:h-full md:border-l md:border-[var(--hair)]";
+  "fixed z-30 flex flex-col overflow-y-auto bg-[var(--panel)] px-[clamp(2.5rem,6vw,6rem)] py-[clamp(3rem,9vh,7rem)] max-md:inset-x-0 max-md:top-[156px] max-md:bottom-0 max-md:justify-start max-md:border-t max-md:border-[var(--hair)] max-md:pt-6 md:top-0 md:right-0 md:h-full md:border-l md:border-[var(--hair)]";
 
-function PanelBody({ id, item }: { id: PanelId; item: Variants }) {
+function PanelBody({
+  id,
+  item,
+  lessonLabel,
+}: {
+  id: PanelId;
+  item: Variants;
+  lessonLabel: string;
+}) {
   switch (id) {
     case "focus":
-      return <FocusPanel item={item} />;
+      return <FocusPanel item={item} lessonLabel={lessonLabel} />;
     case "record":
       return <RecordPanel item={item} />;
     case "now":
       return <NowPanel item={item} />;
     case "speaking":
       return <SpeakingPanel item={item} />;
+    case "modules":
+      return <ModulesPanel item={item} lessonLabel={lessonLabel} />;
     case "toolkit":
       return <ToolkitPanel item={item} />;
     case "contact":
@@ -46,7 +57,7 @@ function PanelBody({ id, item }: { id: PanelId; item: Variants }) {
   }
 }
 
-export default function Site() {
+export default function Site({ lessonLabel }: { lessonLabel: string }) {
   const [active, setActive] = useState<PanelId | null>(null);
   const reduced = useReducedMotion();
   const open = active !== null;
@@ -129,8 +140,8 @@ export default function Site() {
         className={
           "pointer-events-none fixed inset-0 z-20 flex " +
           (open
-            ? "max-md:items-start max-md:justify-center max-md:pt-[clamp(2rem,8vh,4rem)] md:items-center md:justify-start md:pl-[clamp(2.5rem,7vw,6rem)]"
-            : "items-center justify-center")
+            ? "max-md:items-start max-md:justify-center max-md:pt-6 md:items-center md:justify-start md:pl-[clamp(2.5rem,7vw,6rem)]"
+            : "max-md:items-start max-md:justify-center max-md:pt-[72px] md:items-center md:justify-center")
         }
       >
         <motion.nav
@@ -178,7 +189,10 @@ export default function Site() {
                     ease: EASE,
                   }}
                   type="button"
-                  className="subline border-0 bg-transparent"
+                  className={
+                    "subline border-0 bg-transparent" +
+                    (open ? " subline-compact" : "")
+                  }
                   data-active={active === id}
                   aria-current={active === id ? "true" : undefined}
                   onClick={() => {
@@ -223,7 +237,11 @@ export default function Site() {
               initial="hidden"
               animate={isOpen ? "shown" : "hidden"}
             >
-              <PanelBody id={id} item={motionTokens.item} />
+              <PanelBody
+                id={id}
+                item={motionTokens.item}
+                lessonLabel={lessonLabel}
+              />
             </motion.div>
           </motion.section>
         );
