@@ -15,20 +15,19 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background:
-            "radial-gradient(120% 120% at 30% 20%, #0e2a47 0%, #0a1e34 100%)",
-          color: "#ffffff",
+          background: "#f4f1e8",
+          color: "#0f1c2b",
         }}
       >
-        <div style={{ fontSize: 132, fontWeight: 300, letterSpacing: "-0.02em" }}>
+        <div style={{ fontSize: 132, fontWeight: 600, letterSpacing: "-0.02em" }}>
           Butowsky
         </div>
         <div
           style={{
             marginTop: 28,
             fontSize: 22,
-            letterSpacing: "0.35em",
-            color: "rgba(255,255,255,0.62)",
+            letterSpacing: "0.28em",
+            color: "#1e6c41",
           }}
         >
           INVESTMENTS · REAL ESTATE · AI

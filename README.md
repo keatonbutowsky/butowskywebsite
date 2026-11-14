@@ -11,4 +11,4 @@ Personal one-page site for Keaton Butowsky. Next.js (App Router), TypeScript, Ta
 
 ## Editing
 
-Copy lives in `lib/content.ts`. Background colors are `--bg-base` and `--bg-deep` in `app/globals.css`. The default palette is Prussian Ink.
+Copy lives in `lib/content.ts`. The page is cream (`#f4f1e8`) with navy ink and a green accent, set in Inter, Overpass, and Overpass Mono.

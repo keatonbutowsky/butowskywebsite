@@ -30,20 +30,20 @@ export default function DotField() {
           const dx = current.x - x;
           const dy = current.y - y;
           const dist = Math.hypot(dx, dy);
-          let alpha = 0.1;
+          let alpha = 0.08;
           let offsetX = 0;
           let offsetY = 0;
           let radius = 1;
           if (pull > 0 && dist < 170 && dist > 0) {
             const influence = (1 - dist / 170) ** 2 * pull;
-            alpha = 0.1 + 0.45 * influence;
-            offsetX = (dx / dist) * influence * 7;
-            offsetY = (dy / dist) * influence * 7;
-            radius = 1 + 0.6 * influence;
+            alpha = 0.08 + 0.2 * influence;
+            offsetX = (dx / dist) * influence * 5;
+            offsetY = (dy / dist) * influence * 5;
+            radius = 1 + 0.35 * influence;
           }
           context.beginPath();
           context.arc(x + offsetX, y + offsetY, radius, 0, 2 * Math.PI);
-          context.fillStyle = `rgba(255,255,255,${alpha})`;
+          context.fillStyle = `rgba(15,28,43,${alpha})`;
           context.fill();
         }
       }

@@ -91,35 +91,40 @@ function EntryList({
 
 export function FocusPanel({ item }: { item: Variants }) {
   return (
-    <>
-      <motion.div variants={item} id="focus-title" className={eyebrow}>
-        {focus.eyebrow}
-      </motion.div>
-      <motion.h2 variants={item} className={`${headline} mb-8`}>
-        {focus.headline}
-      </motion.h2>
-      <ul>
-        {focus.items.map((row, index) => (
-          <motion.li
-            key={row.idx}
-            variants={item}
-            className={
-              "flex items-baseline gap-6 border-t border-[var(--hair)] py-6" +
-              (index === focus.items.length - 1
-                ? " border-b border-b-[var(--hair)]"
-                : "")
-            }
-          >
-            <span className="min-w-[2.2rem] text-[0.72rem] tracking-[0.2em] text-[var(--muted)]">
-              {row.idx}
-            </span>
-            <span className="font-display text-[clamp(1.5rem,2.6vw,2.1rem)] font-light leading-none tracking-[-0.01em]">
-              {row.title}
-            </span>
-          </motion.li>
-        ))}
-      </ul>
-    </>
+    <motion.div variants={item} className="hero">
+      <figure className="hero-photo">
+        <Image
+          src="/headshot/headshot.jpeg"
+          alt="Keaton Butowsky"
+          width={400}
+          height={400}
+        />
+      </figure>
+      <div>
+        <div id="focus-title" className={eyebrow}>
+          {focus.eyebrow}
+        </div>
+        <h2 className={`${headline} mb-8`}>{focus.headline}</h2>
+        <ul>
+          {focus.items.map((row, index) => (
+            <li
+              key={row.idx}
+              className={
+                "flex items-baseline gap-6 border-t border-[var(--hair)] py-6" +
+                (index === focus.items.length - 1
+                  ? " border-b border-b-[var(--hair)]"
+                  : "")
+              }
+            >
+              <span className="r-num">{row.idx}</span>
+              <span className="font-display text-[clamp(1.5rem,2.6vw,2.1rem)] leading-none tracking-[-0.02em]">
+                {row.title}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </motion.div>
   );
 }
 
@@ -135,7 +140,7 @@ export function ContactPanel({ item }: { item: Variants }) {
       <motion.a
         variants={item}
         href={`mailto:${contact.email}`}
-        className="font-display w-fit text-[clamp(1.5rem,3vw,2.4rem)] font-light tracking-[-0.01em] text-white underline-offset-8 hover:underline focus-visible:underline focus-visible:outline-none"
+        className="font-display w-fit text-[clamp(1.5rem,3vw,2.4rem)] tracking-[-0.02em] text-[var(--accent)] underline-offset-8 hover:underline focus-visible:underline focus-visible:outline-none"
       >
         {contact.email}
       </motion.a>
@@ -147,7 +152,7 @@ export function ContactPanel({ item }: { item: Variants }) {
           href={contact.linkedin}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-fit transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none"
+          className="w-fit text-[var(--accent)] transition-colors hover:underline focus-visible:underline focus-visible:outline-none"
         >
           LinkedIn
         </a>
@@ -200,12 +205,6 @@ export function RecordPanel({ item }: { item: Variants }) {
             {([asset.acquired, asset.managed] as const).map((cell) => (
               <div key={cell.figure + cell.detail}>
                 <div className="ac-fig font-display">{cell.figure}</div>
-                <div className="ac-bar" aria-hidden="true">
-                  <div
-                    className="ac-fill"
-                    style={{ width: `${cell.width}%` }}
-                  />
-                </div>
                 <div className="ac-det">{cell.detail}</div>
               </div>
             ))}
@@ -243,29 +242,45 @@ export function RecordPanel({ item }: { item: Variants }) {
           {company.logo.type === "duo" ? (
             <div className="lg duo">
               {company.logo.marks.map((mark) => (
-                <Image
+                <a
                   key={mark.src}
-                  src={mark.src}
-                  alt={mark.alt}
-                  width={mark.width}
-                  height={mark.height}
-                  className={mark.variant}
-                />
+                  className="lg-link"
+                  href={mark.href}
+                  target="_blank"
+                  rel="noopener"
+                  aria-label={mark.label}
+                >
+                  <Image
+                    src={mark.src}
+                    alt={mark.alt}
+                    width={mark.width}
+                    height={mark.height}
+                    className={mark.variant}
+                  />
+                </a>
               ))}
             </div>
           ) : (
             <div className="lg">
-              <Image
-                src={company.logo.src}
-                alt={company.logo.alt}
-                width={company.logo.width}
-                height={company.logo.height}
-                className={
-                  company.logo.variant === "default"
-                    ? undefined
-                    : company.logo.variant
-                }
-              />
+              <a
+                className="lg-link"
+                href={company.logo.href}
+                target="_blank"
+                rel="noopener"
+                aria-label={company.logo.label}
+              >
+                <Image
+                  src={company.logo.src}
+                  alt={company.logo.alt}
+                  width={company.logo.width}
+                  height={company.logo.height}
+                  className={
+                    company.logo.variant === "default"
+                      ? undefined
+                      : company.logo.variant
+                  }
+                />
+              </a>
             </div>
           )}
           <div>
@@ -322,6 +337,9 @@ export function SpeakingPanel({ item }: { item: Variants }) {
       <motion.h2 variants={item} className={`${headline} mb-8`}>
         {speaking.headline}
       </motion.h2>
+      <motion.p variants={item} className="sp-lede">
+        {speaking.lede}
+      </motion.p>
       <motion.div variants={item} className="trusted">
         <div className="t-lab2">{speaking.trustedLabel}</div>
         <div className="t-marks">
@@ -332,7 +350,59 @@ export function SpeakingPanel({ item }: { item: Variants }) {
           ))}
         </div>
       </motion.div>
-      <EntryList items={speaking.items} item={item} />
+      <motion.div variants={item} className="t-lab2">
+        {speaking.recentLabel}
+      </motion.div>
+      <motion.ul variants={item} className="talks">
+        {speaking.talks.map((talk) => (
+          <li key={talk.title} className="talk">
+            <div>
+              <div className="tk-top">
+                <span className="mono">{talk.when}</span>
+              </div>
+              <div className="tk-org">{talk.org}</div>
+              <h3 className="tk-title font-display">{talk.title}</h3>
+              <dl className="tk-meta">
+                <div>
+                  <dt>Format</dt>
+                  <dd>{talk.format}</dd>
+                </div>
+                <div>
+                  <dt>Audience</dt>
+                  <dd>{talk.audience}</dd>
+                </div>
+              </dl>
+              <p className="tk-take">{talk.takeaway}</p>
+            </div>
+            <figure className="tk-thumb">
+              <Image
+                src={talk.image}
+                alt={talk.caption}
+                width={1600}
+                height={900}
+              />
+              <figcaption>{talk.caption}</figcaption>
+            </figure>
+          </li>
+        ))}
+      </motion.ul>
+      <motion.div variants={item} className="sp-grid">
+        <div>
+          <div className="t-lab2">{speaking.topicsLabel}</div>
+          <ul className="topics">
+            {speaking.topics.map((topic) => (
+              <li key={topic}>{topic}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="book">
+          <div className="t-lab2">{speaking.bookLabel}</div>
+          <p>{speaking.book}</p>
+          <a className="book-link" href={`mailto:${speaking.email}`}>
+            {speaking.email}
+          </a>
+        </div>
+      </motion.div>
     </>
   );
 }

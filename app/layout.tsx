@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
-import { Fraunces, Space_Grotesk } from "next/font/google";
+import { Inter, Overpass, Overpass_Mono } from "next/font/google";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const inter = Inter({
   subsets: ["latin"],
-  axes: ["opsz"],
-  variable: "--font-fraunces",
+  variable: "--font-inter",
 });
 
-const grotesk = Space_Grotesk({
+const overpass = Overpass({
   subsets: ["latin"],
-  variable: "--font-grotesk",
+  variable: "--font-overpass",
+});
+
+const overpassMono = Overpass_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -33,7 +38,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${grotesk.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${overpass.variable} ${overpassMono.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

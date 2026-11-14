@@ -24,7 +24,10 @@ export const navLabels: Record<PanelId, string> = {
   contact: "Contact",
 };
 
-export const widePanels: ReadonlySet<PanelId> = new Set<PanelId>(["record"]);
+export const widePanels: ReadonlySet<PanelId> = new Set<PanelId>([
+  "record",
+  "speaking",
+]);
 
 export const focus = {
   eyebrow: "Focus",
@@ -136,7 +139,7 @@ export const record = {
   notes: [
     "Healthcare Realty acquisitions from SEC filings, with joint venture buildings at full purchase price.",
     "Civitas mezzanine development volume is self-reported.",
-    "Oak Wood figures from the company\u2019s schedule of real estate owned (SREO). Bars scale within each column.",
+    "Oak Wood figures from the company\u2019s schedule of real estate owned (SREO).",
   ],
   currentLabel: "Current",
   current: [
@@ -158,11 +161,13 @@ export const record = {
       title: "Senior Analyst, promoted to Associate, Acquisitions",
       logo: {
         type: "image" as const,
-        src: "/logos/owproperties.png",
-        alt: "Oak Wood Ventures",
+        src: "/logos/oakwood-wordmark.png",
+        alt: "Oak Wood Properties",
         width: 1034,
         height: 225,
         variant: "ow" as const,
+        href: "https://www.owproperties.com/",
+        label: "Oak Wood Properties: company website",
       },
       stats: [
         { label: "Deals", value: "15" },
@@ -187,18 +192,22 @@ export const record = {
         type: "duo" as const,
         marks: [
           {
-            src: "/logos/willowbridge.png",
+            src: "/logos/willowbridge-purple.png",
             alt: "Willow Bridge Property Company",
             width: 276,
             height: 102,
             variant: "wb" as const,
+            href: "https://www.willowbridgepc.com/",
+            label: "Willow Bridge Property Company: company website",
           },
           {
-            src: "/logos/lpc-classic.png",
+            src: "/logos/lpc-classic-green.png",
             alt: "Lincoln Property Company",
             width: 400,
             height: 197,
             variant: "lpc" as const,
+            href: "https://www.willowbridgepc.com/",
+            label: "Lincoln Property Company: company website",
           },
         ],
       },
@@ -224,11 +233,13 @@ export const record = {
       title: "Analyst, Investments",
       logo: {
         type: "image" as const,
-        src: "/logos/civitas.png",
+        src: "/logos/civitas-red.png",
         alt: "Civitas Capital Group",
         width: 399,
         height: 400,
         variant: "sq" as const,
+        href: "https://www.civitascapital.com/",
+        label: "Civitas Capital Group: company website",
       },
       stats: [
         { label: "Deals", value: "40+" },
@@ -261,11 +272,13 @@ export const record = {
       title: "Analyst, Investments",
       logo: {
         type: "image" as const,
-        src: "/logos/healthcarerealty.png",
+        src: "/logos/hr-blue.png",
         alt: "Healthcare Realty",
         width: 1411,
         height: 400,
         variant: "default" as const,
+        href: "https://www.healthcarerealty.com/",
+        label: "Healthcare Realty: company website",
       },
       stats: [
         { label: "Deals", value: "27" },
@@ -334,32 +347,74 @@ export const now = {
 };
 
 export const speaking = {
-  eyebrow: "Featured speaking",
+  eyebrow: "Speaking",
   headline: "In the room.",
+  lede: "Classes and masterclasses on putting AI to work in real estate, from first prompt to working agent.",
   trustedLabel: "Trusted by",
-  trusted: ["ULI Los Angeles", "SMU Cox"],
-  items: [
+  trusted: [
+    "ULI Los Angeles",
+    "SMU Cox School of Business",
+    "Lucens Capital",
+  ],
+  recentLabel: "Recent talks",
+  talks: [
     {
-      idx: "01",
+      when: "Nov 12, 2026 \u00b7 Dallas",
+      org: "SMU Cox MBA",
       title: "Building Agents",
-      // Held Thursday, Nov 12, 2026. Shown as a past session, same shape as the others.
-      meta: ["SMU Cox MBA", "Nov 2026"],
-      description: "A class for MBA students on building AI agents.",
+      format: "Class",
+      audience: "SMU Cox MBA students",
+      takeaway:
+        "From chat to agents: a prompt alone gets a generic answer, context makes it specific, and tools plus a loop let the model act, check the result and go again until the job is done.",
+      image: "/speaking/thumb-building-agents-c2a-p3-loop.png",
+      caption: "Slide: Agents. Give it tools.",
     },
     {
-      idx: "02",
+      when: "Fall 2026 \u00b7 Los Angeles",
+      org: "ULI Los Angeles",
       title: "AI for CRE: Data to Deal",
-      meta: ["ULI Los Angeles", "Masterclass", "Fall 2026"],
-      description:
-        "Speaker in ULI Los Angeles\u2019s masterclass on AI for commercial real estate. Ran the October 13 Cowork session.",
+      format: "Masterclass, Session 04: Claude Cowork",
+      audience: "ULI Los Angeles masterclass participants",
+      takeaway:
+        "Automate the boring parts: attendees built a data room check and a property news check in Claude Cowork, then saved each as a scheduled task.",
+      image: "/speaking/thumb-uli-title.png",
+      caption: "Title slide: Automate the boring parts.",
     },
     {
-      idx: "03",
+      when: "May 2026 \u00b7 Dallas",
+      org: "SMU Cox MBA",
       title: "Intro to AI",
-      meta: ["SMU Cox MBA", "Four-hour session", "May 2026"],
-      description: "A four-hour introduction to AI for MBA students.",
+      format: "Four-hour session",
+      audience: "SMU Cox MBA students",
+      takeaway:
+        "How large language models work, prompting with task, context, format and constraints, why context matters, and what an agent is.",
+      image: "/speaking/thumb-intro-to-ai-s14-context.png",
+      caption: "Slide: AI knows nothing until you tell it to.",
     },
-  ] satisfies Entry[],
+    {
+      when: "Apr 2026 \u00b7 Buenos Aires, Argentina",
+      org: "Consulting",
+      title: "Lucens Capital",
+      format: "Consulting engagement",
+      audience: "Lucens Capital leadership",
+      takeaway:
+        "Built an 18-month AI implementation roadmap for a portfolio company: demand forecasting, labor scheduling and customer sentiment.",
+      image: "/speaking/thumb-lucens-how-we-evaluate-ai.png",
+      caption: "Slide: How we evaluate AI.",
+    },
+  ],
+  topicsLabel: "Topics",
+  topics: [
+    "How large language models work",
+    "Prompting: task, context, format and constraints",
+    "Giving AI the right context",
+    "Agents: tools and a loop",
+    "Scheduled tasks for real estate work: data room checks and property news",
+    "AI implementation roadmaps for portfolio companies",
+  ],
+  bookLabel: "Book Keaton to speak",
+  book: "Classes and masterclasses for real estate teams, family offices and business schools.",
+  email: "keaton@butowsky.com",
 };
 
 export const toolkit = {

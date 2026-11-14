@@ -23,7 +23,7 @@ const EASE = [0.76, 0, 0.24, 1] as const;
 const ORDER: (PanelId | null)[] = [null, ...panelOrder];
 
 const SHELL =
-  "fixed z-30 flex flex-col overflow-y-auto bg-[linear-gradient(180deg,rgba(0,0,0,.16),rgba(0,0,0,.34))] px-[clamp(2.5rem,6vw,6rem)] py-[clamp(3rem,9vh,7rem)] max-md:inset-x-0 max-md:bottom-0 max-md:h-[68%] max-md:justify-start max-md:border-t max-md:border-[var(--hair)] max-md:pt-10 md:top-0 md:right-0 md:h-full md:border-l md:border-[var(--hair)] md:shadow-[-50px_0_90px_rgba(0,0,0,.28)]";
+  "fixed z-30 flex flex-col overflow-y-auto bg-[var(--panel)] px-[clamp(2.5rem,6vw,6rem)] py-[clamp(3rem,9vh,7rem)] max-md:inset-x-0 max-md:bottom-0 max-md:h-[68%] max-md:justify-start max-md:border-t max-md:border-[var(--hair)] max-md:pt-10 md:top-0 md:right-0 md:h-full md:border-l md:border-[var(--hair)]";
 
 function PanelBody({ id, item }: { id: PanelId; item: Variants }) {
   switch (id) {
