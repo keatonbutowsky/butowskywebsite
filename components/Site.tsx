@@ -11,7 +11,6 @@ import {
   NowPanel,
   RecordPanel,
   SpeakingPanel,
-  ToolkitPanel,
 } from "@/components/Panels";
 import {
   navLabels,
@@ -46,8 +45,6 @@ function PanelBody({
       return <SpeakingPanel item={item} />;
     case "modules":
       return <ModulesPanel item={item} lessonLabel={lessonLabel} />;
-    case "toolkit":
-      return <ToolkitPanel item={item} />;
     case "contact":
       return <ContactPanel item={item} />;
     default: {
