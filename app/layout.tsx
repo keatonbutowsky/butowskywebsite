@@ -14,7 +14,7 @@ const overpass = Overpass({
 
 const overpassMono = Overpass_Mono({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: "400",
   variable: "--font-mono",
 });
 
