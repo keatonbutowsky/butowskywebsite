@@ -3,6 +3,7 @@ export type PanelId =
   | "record"
   | "now"
   | "speaking"
+  | "modules"
   | "toolkit"
   | "contact";
 
@@ -11,6 +12,7 @@ export const panelOrder: PanelId[] = [
   "record",
   "now",
   "speaking",
+  "modules",
   "toolkit",
   "contact",
 ];
@@ -20,6 +22,7 @@ export const navLabels: Record<PanelId, string> = {
   record: "Record",
   now: "Now",
   speaking: "Speaking",
+  modules: "Modules",
   toolkit: "Toolkit",
   contact: "Contact",
 };
@@ -37,6 +40,10 @@ export const focus = {
     { idx: "02", title: "Real Estate" },
     { idx: "03", title: "Artificial Intelligence" },
   ],
+  teaser: {
+    label: "Educational modules",
+    line: "Free interactive lessons, one idea each.",
+  },
 };
 
 export const contact = {
@@ -415,6 +422,13 @@ export const speaking = {
   bookLabel: "Book Keaton to speak",
   book: "Classes and masterclasses for real estate teams, family offices and business schools.",
   email: "keaton@butowsky.com",
+};
+
+export const modules = {
+  eyebrow: "Educational Modules",
+  headline: "One idea at a time.",
+  lede: "Free interactive lessons in commercial real estate. One concept each, with a picture you can drag.",
+  href: "https://cre.butowsky.com",
 };
 
 export const toolkit = {
