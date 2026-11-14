@@ -10,7 +10,6 @@ import {
   now,
   record,
   speaking,
-  toolkit,
   type Entry,
   type TextPart,
 } from "@/lib/content";
@@ -458,20 +457,6 @@ export function ModulesPanel({
       >
         {lessonLabel}
       </motion.a>
-    </>
-  );
-}
-
-export function ToolkitPanel({ item }: { item: Variants }) {
-  return (
-    <>
-      <motion.div variants={item} id="toolkit-title" className={eyebrow}>
-        {toolkit.eyebrow}
-      </motion.div>
-      <motion.h2 variants={item} className={`${headline} mb-8`}>
-        {toolkit.headline}
-      </motion.h2>
-      <EntryList items={toolkit.items} item={item} />
     </>
   );
 }

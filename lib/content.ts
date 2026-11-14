@@ -4,7 +4,6 @@ export type PanelId =
   | "now"
   | "speaking"
   | "modules"
-  | "toolkit"
   | "contact";
 
 export const panelOrder: PanelId[] = [
@@ -13,7 +12,6 @@ export const panelOrder: PanelId[] = [
   "now",
   "speaking",
   "modules",
-  "toolkit",
   "contact",
 ];
 
@@ -22,8 +20,7 @@ export const navLabels: Record<PanelId, string> = {
   record: "Record",
   now: "Now",
   speaking: "Speaking",
-  modules: "Modules",
-  toolkit: "Toolkit",
+  modules: "Resources",
   contact: "Contact",
 };
 
@@ -41,7 +38,7 @@ export const focus = {
     { idx: "03", title: "Artificial Intelligence" },
   ],
   teaser: {
-    label: "Educational modules",
+    label: "Free resources",
     line: "Free interactive lessons, one idea each.",
   },
 };
@@ -384,8 +381,8 @@ export const speaking = {
       audience: "ULI Los Angeles masterclass participants",
       takeaway:
         "Automate the boring parts: attendees built a data room check and a property news check in Claude Cowork, then saved each as a scheduled task.",
-      image: "/speaking/thumb-uli-title.png",
-      caption: "Title slide: Automate the boring parts.",
+      image: "/speaking/thumb-uli-refi-chart.png",
+      caption: "Refi module from cre.butowsky.com: where the cash goes.",
     },
     {
       when: "May 2026 \u00b7 Dallas",
@@ -425,26 +422,8 @@ export const speaking = {
 };
 
 export const modules = {
-  eyebrow: "Educational Modules",
-  headline: "One idea at a time.",
-  lede: "Free interactive lessons in commercial real estate. One concept each, with a picture you can drag.",
+  eyebrow: "Free Resources",
+  headline: "The legal pad, turned interactive.",
+  lede: "I\u2019ve drawn the same pictures on a legal pad for every intern and new analyst I\u2019ve trained in commercial real estate. So I turned them into free interactive modules. Drag the inputs and watch the deal change. Best on desktop.",
   href: "https://cre.butowsky.com",
-};
-
-export const toolkit = {
-  eyebrow: "Toolkit",
-  headline: "Both sides of the desk.",
-  items: [
-    {
-      idx: "01",
-      title: "Underwriting",
-      description:
-        "ARGUS Enterprise, CoStar, Real Capital Analytics, Yardi, RealPage, Juniper Square.",
-    },
-    {
-      idx: "02",
-      title: "Building",
-      description: "Claude Code, Cursor, agent orchestration.",
-    },
-  ] satisfies Entry[],
 };
