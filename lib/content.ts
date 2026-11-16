@@ -381,8 +381,8 @@ export const speaking = {
       audience: "ULI Los Angeles masterclass participants",
       takeaway:
         "Automate the boring parts: attendees built a data room check and a property news check in Claude Cowork, then saved each as a scheduled task.",
-      image: "/speaking/thumb-uli-refi-chart.png",
-      caption: "Refi module from cre.butowsky.com: where the cash goes.",
+      image: "/speaking/thumb-uli-title.png",
+      caption: "Title slide: Automate the boring parts.",
     },
     {
       when: "May 2026 \u00b7 Dallas",
